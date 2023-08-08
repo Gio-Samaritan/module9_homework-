@@ -1,25 +1,53 @@
-let input1 = document.getElementById('input1');
-let input2 = document.getElementById('input2');
-let button = document.getElementById('button');
-let value1 = input1.value;
-let value2 = input2.value;
-button.onclick = function() {
-  if((input1.value > 10 || input1.value < 1) 
-     && (input2.value > 10 || input2.value < 1))
-    {
-    alert('Номер страницы и лимит вне диапазона от 1 до 10');
-    input1.value = '';
-    input2.value = '';
-    }
-  else if(input1.value > 10 || input1.value < 1){
-    alert('Номер страницы вне диапазона от 1 до 10');
-    input1.value = '';}
-  else if(input2.value > 10 || input2.value < 1){
-    alert('Лимит вне диапазона от 1 до 10');
-    input2.value = '';}
-else{
-  fetch(`https://picsum.photos/v2/list?page=${value1}&limit=${value2}`)
-  .then(response => response.json())
-  .then(response => console.log(response))
+const numbers = document.querySelector("#width");
+const limit = document.querySelector("#heigth");
+const btn = document.querySelector("#submit");
+let div = document.querySelector("#div");
+
+loadPhotosFromLocalStorage();
+
+btn.addEventListener("click", func1);
+
+function func1() {
+  if (
+    (Number(numbers.value) < 1 || Number(numbers.value) > 10) &&
+    (Number(limit.value) < 1 || Number(limit.value) > 10)
+  ) {
+    console.log("Номер страницы и лимит вне диапазона от 1 до 10");
+    return;
+  } else if (Number(numbers.value) < 1 || Number(numbers.value) > 10) {
+    console.log("Номер страницы вне диапазона от 1 до 10");
+    return;
+  } else if (Number(limit.value) < 1 || Number(limit.value) > 10) {
+    console.log("Лимит вне диапазона от 1 до 10");
+    return;
+  } else {
+    fetch(
+      `https://jsonplaceholder.typicode.com/photos?_page=${Number(
+        numbers.value
+      )}&_limit=${Number(limit.value)}`
+    )
+      .then((response) => response.json())
+      .then((json) => {
+        func2(json);
+        savePhotosToLocalStorage();
+      });
+  }
 }
+
+function func2(arg) {
+  let container = String();
+  arg.forEach((arg) => {
+    const containerBlock = `
+        <img src="${arg.url}" alt="фото">`;
+    container = container + containerBlock;
+  });
+  div.innerHTML = container;
+}
+
+function savePhotosToLocalStorage() {
+  localStorage.setItem("last_photos", div.innerHTML);
+}
+function loadPhotosFromLocalStorage() {
+  div.innerHTML = localStorage.getItem("last_photos");
+  return div.innerHTML;
 }
